@@ -1,12 +1,16 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
 const pool = require('./config/db');
-const port = 3000
+const cors = require('cors');
+const port = 3000;
 const postItRoutes = require('./routes/postItRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/postits', postItRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
