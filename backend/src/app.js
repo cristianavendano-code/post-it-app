@@ -2,6 +2,11 @@ const express = require('express')
 const app = express()
 const pool = require('./config/db');
 const port = 3000
+const postItRoutes = require('./routes/postItRoutes');
+
+app.use(express.json());
+
+app.use('/api/postits', postItRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
