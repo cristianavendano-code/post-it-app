@@ -23,17 +23,17 @@ const create = async (data) => {
 
 // Update a post-it
 const update = async (id, data) => {
-    await pool.query(
+    const [result] = await pool.query(
         'UPDATE notes SET content = ?, created_at = ? WHERE id = ?',
         [data.content, new Date(), id]
     );
-    return id;
+    return result.affectedRows > 0 ? id : null;
 };
 
 // Delete a post-it
 const remove = async (id) => {
-    await pool.query ('DELETE FROM notes WHERE id = ?', [id]);
-    return id;
+    const [result] = await pool.query ('DELETE FROM notes WHERE id = ?', [id]);
+    return result.affectedRows > 0 ? id : null;
 };
 
 module.exports = {
