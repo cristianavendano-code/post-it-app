@@ -4,7 +4,8 @@ const postItModel = require('../models/postItModel');
 // function to get all post-its
 async function getAllPostIts(req, res) {
     try {
-        const postIts = await postItModel.getAll();
+        const userId = req.user.id;
+        const postIts = await postItModel.getAll(userId);
         if (!postIts.length) {
             return res.status(404).json({ message: "No post-its found" });
         }
@@ -12,21 +13,22 @@ async function getAllPostIts(req, res) {
         return res.json(postIts)
 
     } catch (error) {
-        res.status(500).json({ message: "Error retrieving post-its", error: error.message });
+        return res.status(500).json({ message: "Error retrieving post-its", error: error.message });
     } 
 };
 
 // function to get a post-it by ID
 async function getPostItById(req, res) {
     try {
+        const userId = req.user.id;
         const id = req.params.id;
         if (!id) {
             return res.status(400).json({ message: "ID of the post-it is required" });
         }
 
-        const postIt = await postItModel.getById(id);
+        const postIt = await postItModel.getById(id, userId);
         if (!postIt) {
-            return res.status(404).json({ message: "post-it not found" });
+            return res.status(404).json({ message: "post-it not found or unauthorized" });
         }
         
         return res.json(postIt);
@@ -39,12 +41,13 @@ async function getPostItById(req, res) {
 // function to create a new post-it
 async function createPostIt(req, res) {
     try {
-        const data = req.body;
-        if (!data.content || !data.userId) {
-            return res.status(400).json({ message: "Content and userId are required" });
+        const content = req.body.content;
+        const userId = req.user.id;
+        if (!content) {
+            return res.status(400).json({ message: "Content is required" });
         }
 
-        const insertId = await postItModel.create(req.body);
+        const insertId = await postItModel.create(content, userId);
         
         return res.status(201).json({ message: "post-it created successfully", id: insertId });
 
@@ -56,19 +59,20 @@ async function createPostIt(req, res) {
 // function to update a post-it
 async function updatePostIt(req, res) {
     try {
+        const userId = req.user.id;
         const id = req.params.id;
         if (!id) {
             return res.status(400).json({ message: "ID of the post-it is required" });
         }
         
-        const data = req.body;
-        if (!data.content ) {
+        const content = req.body.content;
+        if (!content ) {
             return res.status(400).json({ message: "Content is required" });
         }
 
-        const updatedId = await postItModel.update(id, data);
+        const updatedId = await postItModel.update(id, content, userId);
         if (!updatedId) {
-            return res.status(404).json({ message: "post-it not found" });
+            return res.status(404).json({ message: "post-it not found or unauthorized" });
         }
         
         return res.json({ message: "post-it updated successfully", id: updatedId });
@@ -81,12 +85,13 @@ async function updatePostIt(req, res) {
 // function to delete a post-it
 async function deletePostIt(req, res) {
     try {
+        const userId = req.user.id;
         const id = req.params.id;
         if (!id) {
             return res.status(400).json({ message: "ID of the post-it is required" });
         }
 
-        const deletedId = await postItModel.remove(id);
+        const deletedId = await postItModel.remove(id, userId);
         if (!deletedId) {
             return res.status(404).json({ message: "post-it not found" });
         }

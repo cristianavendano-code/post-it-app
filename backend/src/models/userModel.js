@@ -9,6 +9,16 @@ const create = async (data) => {
     return result.insertId;
 }
 
+// Get a user by email
+const getByEmail = async (email) => {
+    const [result] = await pool.query(
+        'SELECT * FROM users WHERE email = ?',
+        [email]
+    );
+    return result[0];
+}
+
 module.exports = {
-    create
+    create,
+    getByEmail
 };

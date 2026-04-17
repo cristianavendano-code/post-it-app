@@ -1,14 +1,15 @@
 const router = require('express').Router();
 const postItController = require('../controllers/postItController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
-router.get('/', postItController.getAllPostIts);
+router.get('/', authMiddleware, postItController.getAllPostIts);
 
-router.get('/:id', postItController.getPostItById);
+router.get('/:id', authMiddleware, postItController.getPostItById);
 
-router.post('/', postItController.createPostIt);
+router.post('/', authMiddleware, postItController.createPostIt);
 
-router.put('/:id', postItController.updatePostIt);
+router.put('/:id', authMiddleware, postItController.updatePostIt);
 
-router.delete('/:id', postItController.deletePostIt);
+router.delete('/:id', authMiddleware, postItController.deletePostIt);
 
 module.exports = router;
