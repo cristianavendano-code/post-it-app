@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -21,7 +23,7 @@ export default function Login() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 console.log("Pasaporte Criptográfico Guardado:", data.token);
-                alert('Enlace confirmado. Token guardado en localStorage.');
+                navigate('/dashboard');
             } else{
                 console.error("Rechazo de aduana:", data.error);
                 alert(data.error ||  'Falla de autenticación');
