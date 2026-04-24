@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PostIt from './PostIt';
 
 export default function Dashboard() {
     const [notes, setNotes] = useState([]);
-    const [newContent, setNewContent] = useState('');
-    const [newPostItModel, setNewPostItOpen] = useState(false);
+    const [content, setContent] = useState('');
+    const [viewNewNote, setViewNewNote] = useState(false);
+    const [viewEditNote, setViewEditNote] = useState(null);
     const navigate = useNavigate();
 
-    // 1. MOTOR DE LECTURA (GET)
     useEffect(() => {
         const fetchNotes = async () => {
             const token = localStorage.getItem('token');
@@ -21,8 +22,7 @@ export default function Dashboard() {
                     const data = await response.json();
                     setNotes(data);
                 } else {
-                    localStorage.removeItem('token');
-                    navigate('/login');
+                    console.log('No hay notas para mostrar');
                 }
             } catch (error) {
                 console.error('Falla de telemetría:', error);
@@ -31,7 +31,6 @@ export default function Dashboard() {
         fetchNotes();
     }, [navigate]);
 
-    // 2. MOTOR DE INYECCIÓN (POST)
     const handleCreateNote = async () => {
         const token = localStorage.getItem('token');
         if (!token) return navigate('/login');
@@ -43,22 +42,20 @@ export default function Dashboard() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ content: newContent })
+                body: JSON.stringify({ content: content })
             });
 
             if (response.ok) {
                 const data = await response.json();
-                // Corrección Crítica: Ensamblaje manual del objeto
-                setNotes([...notes, { id: data.id, content: newContent }]);
-                setNewContent('');
-                setIsModalOpen(false);
+                setNotes([...notes, { id: data.id, content: content }]);
+                setContent('');
+                setViewNewNote(false);
             }
         } catch (error) {
             console.error('Falla de inyección:', error);
         }
     };
 
-    // Modificar nota
     const handleUpdateNote = async (id, updatedContent) => {
         const token = localStorage.getItem('token');
         if (!token) return navigate('/login');
@@ -75,13 +72,13 @@ export default function Dashboard() {
 
             if (response.ok) {
                 setNotes(notes.map(note => note.id === id ? { ...note, content: updatedContent } : note));
+                setViewEditNote(null);
             }
         } catch (error) {
             console.error('Falla de actualización:', error);
         }
     };
 
-    // 3. MOTOR DE ERRADICACIÓN (DELETE)
     const handleDeleteNote = async (id) => {
         const token = localStorage.getItem('token');
         if (!token) return navigate('/login');
@@ -101,67 +98,79 @@ export default function Dashboard() {
         }
     };
 
-    // 4. PROTOCOLO DE EYECCIÓN
     const logout = () => {
         localStorage.removeItem('token');
         navigate('/login');
     };
 
     return (
-        <div className='min-h-screen bg-gray-900 p-8'>
-            <div className='flex justify-between items-center mb-8'>
-                <h1 className='text-3xl font-bold text-white'>Panel Táctico</h1>
-                <div className="gap-4 flex">
-                    <button onClick={() => newPostItModel(true)} className='bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold'>
-                        NUEVA UNIDAD
-                    </button>
-                    <button onClick={logout} className='bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold'>
-                        ABORTAR (LOGOUT)
-                    </button>
+        <div className="flex h-screen w-full items-center justify-center bg-cover bg-[url(./assets/whitewall.jpg)] bg-green-700 p-4">
+            <div className="flex w-full max-w-6xl aspect-video flex-col items-center justify-center bg-cover bg-[url(./assets/wooden-background.jpg)] p-6 md:p-10 shadow-xl/50">
+                <div className="w-full h-full p-8 md:p-12 bg-cover bg-[url(./assets/cork-board.jpg)] inset-shadow-sm inset-shadow-black overflow-y-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-start">
+                        {notes.map(note => (
+                            <PostIt 
+                                key={note.id} 
+                                text={note.content}
+                                onClick={() => {
+                                    setViewEditNote(note.id);
+                                    setContent(note.content);
+                                }} 
+                            />
+                        ))}
+                    </div>
                 </div>
+                <button 
+                    onClick={() => setViewNewNote(true)} 
+                    className="
+                        absolute bottom-8 left-8
+                        w-32 h-32 flex items-center justify-center 
+                        text-black font-semibold text-4xl
+                        shadow-[2px_4px_6px_rgba(0,0,0,0.25)] 
+                        transition-all duration-200 hover:scale-105 hover:shadow-xl hover:z-10
+                        bg-yellow-400 hover:bg-yellow-500
+                    "
+                >+</button>
+                
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-                {notes.map(note => (
-                    <div key={note.id} className='bg-yellow-200 p-4 rounded shadow-lg text-black flex flex-col justify-between min-h-[150px] relative group'>
-                        <p className="whitespace-pre-wrap">{note.content}</p>
-                        
-                        {/* Botón de Erradicación Inyectado */}
-                        <button 
-                            onClick={() => handleDeleteNote(note.id)} 
-                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-700 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Destruir Unidad"
-                        >
-                            ✕
-                        </button>
 
-                        <button 
-                            onClick={() => setIsModalOpen(true)}className="absolute bottom-2 right-2 bg-blue-500 hover:bg-blue-700 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Modificar Unidad"
-                        >
-                            ✎
-                        </button>
-                    </div> 
-                ))}
-            </div>
-
-            {newPostItModel && (
-                <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50'>
-                    <div className='bg-gray-800 p-6 rounded shadow-lg w-96 border border-gray-600'>
-                        <h2 className='text-xl text-white font-bold mb-4'>Parámetros de Inyección</h2>
+            {viewEditNote !== null && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="bg-yellow-400 p-8 shadow-xl/50 shadow-[2px_4px_6px_rgba(0,0,0,0.25)] w-96 h-96 relative">
+                        <button onClick={() => setViewEditNote(null)} className="absolute top-2 right-4 text-red-400 font-bold">X</button>
                         <textarea
-                            value={newContent}
-                            onChange={(e) => setNewContent(e.target.value)}
-                            className='w-full p-2 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none'
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            className='w-full p-2 bg-yellow-400 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none'
                             placeholder='Escribe los datos aquí...' 
                             rows="4"
                         />
                         <div className="flex justify-end gap-3">
-                            <button onClick={() => setNewPostItOpen(false)} className='bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded'>
-                                CANCELAR
+                            <button 
+                                onClick={() => handleUpdateNote(viewEditNote, content)} 
+                                className='w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4'>
+                                Rewrite
                             </button>
-                            <button onClick={handleCreateNote} className='bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold'>
-                                EJECUTAR
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {viewNewNote && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="bg-yellow-400 p-8 shadow-xl/50 shadow-[2px_4px_6px_rgba(0,0,0,0.25)] w-96 h-96 relative">
+                        <button onClick={() => setViewNewNote(false)} className="absolute top-2 right-4 text-red-400 font-bold">X</button>
+                        <textarea
+                            className='w-full p-2 bg-yellow-400 text-black mb-4 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none'
+                            placeholder='Escribe los datos aquí...' 
+                            rows="4"
+                        />
+                        <div className="flex justify-end gap-3">
+                            <button 
+                                onClick={() => handleCreateNote(viewNewNote, content)} 
+                                className='w-full bg-yellow-600 hover:bg-yellow-700 text-black font-bold py-2 px-4'>
+                                Add
                             </button>
                         </div>
                     </div>

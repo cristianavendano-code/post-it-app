@@ -65,7 +65,7 @@ export default function Login() {
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-cover bg-[url(./assets/whitewall.jpg)] bg-green-700 p-4">
-            <div className="flex w-full max-w-6xl aspect-[16/9] flex-col items-center justify-center bg-cover bg-[url(./assets/wooden-background.jpg)] p-6 md:p-10 shadow-xl/50">
+            <div className="flex w-full max-w-6xl aspect-video flex-col items-center justify-center bg-cover bg-[url(./assets/wooden-background.jpg)] p-6 md:p-10 shadow-xl/50">
                 <div className="flex justify-center w-full h-full gap-20 items-center  bg-cover bg-[url(./assets/cork-board.jpg)] inset-shadow-sm inset-shadow-black">                
                     <PostIt onClick={() => setViewLogin(true)} text="Log In" />
                     <PostIt onClick={() => setViewNewUser(true)} text="New User" />
