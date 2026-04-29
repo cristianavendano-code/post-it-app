@@ -14,19 +14,19 @@ export default function PostIt({ id, text, onClick, isDraggable = false, textSiz
 
 
     return (
-        <motion.button 
+        <motion.button
             onClick={(e) => {
                 if (!isDragging.current) {
                     onClick(e);
                 }
-            }} 
-            
+            }}
+
             drag={isDraggable}
             dragSnapToOrigin={true}
-            
+
             dragElastic={0}
             dragMomentum={false}
-            
+
             whileDrag={{ scale: 1.1, zIndex: 50 }}
 
             onDragStart={() => {
@@ -41,23 +41,23 @@ export default function PostIt({ id, text, onClick, isDraggable = false, textSiz
                     onTrashHover(isOver);
                 }
             }}
-            
+
             onDragEnd={(e, info) => {
                 if (onTrashHover) onTrashHover(false);
 
-                e.target.style.visibility = 'hidden'; 
+                e.target.style.visibility = 'hidden';
                 const elementBelow = document.elementFromPoint(info.point.x, info.point.y);
                 e.target.style.visibility = 'visible';
-                
+
                 if (elementBelow && elementBelow.closest('#basurero') && onDelete) {
-                    onDelete(id); 
+                    onDelete(id);
                 }
 
                 setTimeout(() => {
                     isDragging.current = false;
                 }, 100);
             }}
-            
+
             className={`
                 ${rotation}
                 relative w-32 h-32 flex items-center justify-center 

@@ -97,7 +97,6 @@ export default function Dashboard() {
             });
 
             if (response.ok) {
-                // Purga matemática de la memoria visual
                 setNotes(prevNotes => prevNotes.filter(note => String(note.id) !== String(id)));
             }
         } catch (error) {
@@ -143,6 +142,29 @@ export default function Dashboard() {
                         +
                     </button>
                 )}
+
+                <button
+                    onClick={logout}
+                    className="fixed bottom-15 right-58 w-28 h-10 flex items-center justify-center transition-transform duration-200 hover:scale-105 group z-40 drop-shadow-md cursor-pointer"
+                >
+                    <svg viewBox="0 0 120 40" className="absolute inset-0 w-full h-full">
+                        <polygon
+                            points="0,0 120,0 105,20 120,40 0,40"
+                            fill="#e53d3d"
+                        />
+                        <polygon
+                            points="4,4 112,4 99,20 112,36 4,36"
+                            fill="none"
+                            stroke="#1a1a1a"
+                            strokeWidth="1.5"
+                            strokeDasharray="6, 4"
+                        />
+                    </svg>
+                    <span className="relative z-10 font-hand text-xl font-bold text-black pr-4 tracking-wider">
+                        Logout
+                    </span>
+                </button>
+
                 <div
                     id="basurero"
                     className={`
