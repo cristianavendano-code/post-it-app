@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostIt from './PostIt';
-import { motion } from 'framer-motion';
+import paperBasketImg from '../assets/paper-basket.png';
 
 export default function Dashboard() {
     const [notes, setNotes] = useState([]);
@@ -168,36 +168,16 @@ export default function Dashboard() {
                 <div
                     id="basurero"
                     className={`
-                        fixed bottom-0 right-2
-                        w-50 h-50 flex flex-col items-center justify-center transition-colors duration-300
+                        fixed bottom-2 right-4
+                        w-45 h-45 flex flex-col items-center justify-center transition-transform duration-300
+                        ${isTrashOpen ? 'scale-110 drop-shadow-2xl' : 'scale-100 drop-shadow-md'}
                     `}
                 >
-                    <motion.svg
-                        viewBox="0 0 100 100"
-                        className="w-50 h-50"
-                        animate={{
-                            rotate: isTrashOpen ? [0, -5, 5, -5, 5, 0] : 0,
-                        }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                    >
-                        <defs>
-                            <pattern id="wire-mesh" width="6" height="6" patternUnits="userSpaceOnUse">
-                                <path d="M0,0 L6,6 M6,0 L0,6" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
-                            </pattern>
-                            <linearGradient id="bin-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="rgba(0,0,0,0.6)" />
-                                <stop offset="30%" stopColor="rgba(0,0,0,0.1)" />
-                                <stop offset="70%" stopColor="rgba(0,0,0,0.1)" />
-                                <stop offset="100%" stopColor="rgba(0,0,0,0.7)" />
-                            </linearGradient>
-                        </defs>
-                        <ellipse cx="50" cy="20" rx="35" ry="10" fill="rgba(0,0,0,0.8)" />
-                        <path d="M 15,20 L 30,90 A 20 6 0 0 0 70,90 L 85,20 Z" fill="url(#wire-mesh)" />
-                        <path d="M 15,20 L 30,90 A 20 6 0 0 0 70,90 L 85,20 Z" fill="url(#bin-shadow)" />
-                        <ellipse cx="50" cy="90" rx="20" ry="6" fill="none" stroke="currentColor" strokeWidth="3" />
-                        <path d="M 15,20 A 35 10 0 0 0 85,20" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" />
-                        <path d="M 15,20 A 35 10 0 0 1 85,20" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.5" />
-                    </motion.svg>
+                    <img 
+                        src={paperBasketImg}
+                        alt="Paper Basket"
+                        className="w-full h-full object-contain pointer-events-none"
+                    />
                 </div>
 
             </div>
